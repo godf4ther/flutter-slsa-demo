@@ -56,9 +56,10 @@ jobs:
           flutter pub get
           flutter build ios --release --config-only --no-codesign
 
-      - name: pod install
+      - name: pod install（仅当存在 Podfile；无 CocoaPods 插件的项目自动跳过）
         working-directory: ios
-        run: pod install
+        run: |
+          if [ -f Podfile ]; then pod install; else echo "无 Podfile（项目无 CocoaPods 插件），跳过 pod install"; fi
 
       - name: 签发证书仓库短期访问 token
         id: cert-token
