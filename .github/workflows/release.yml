@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      upload-to-store:
+        description: "构建后是否上传商店"
+        type: boolean
+        default: false
+
+jobs:
+  ios:
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/build-ios.yml
+    with:
+      upload-to-store: ${{ github.event_name == 'push' || inputs.upload-to-store }}
+    secrets: inherit
+
+  android:
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/build-android.yml
+    with:
+      upload-to-store: ${{ github.event_name == 'push' || inputs.upload-to-store }}
+    secrets: inherit

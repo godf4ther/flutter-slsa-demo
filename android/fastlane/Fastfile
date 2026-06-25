@@ -1,0 +1,17 @@
+# 职责：Android 由 `flutter build appbundle` 完成签名构建，fastlane 只负责上传。
+default_platform(:android)
+
+# 产物固定路径契约（相对仓库根）。
+AAB_PATH = File.expand_path("../../build/app/outputs/bundle/release/app-release.aab", __dir__)
+
+platform :android do
+  desc "上传 .aab 到 Google Play Internal app sharing（不进测试轨道、不审核）"
+  lane :upload do
+    upload_to_play_store_internal_app_sharing(
+      aab: AAB_PATH,
+      package_name: ENV.fetch("ANDROID_PACKAGE_NAME"),
+      json_key_data: ENV.fetch("PLAY_SERVICE_ACCOUNT_JSON"),
+    )
+    UI.success("已上传 Internal app sharing: #{AAB_PATH}")
+  end
+end

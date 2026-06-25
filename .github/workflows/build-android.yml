@@ -1,0 +1,101 @@
+name: Build, Sign & Attest Android (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      upload-to-store:
+        description: "构建并 attest 后是否上传 Google Play Internal app sharing"
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    env:
+      ANDROID_PACKAGE_NAME: ${{ vars.ANDROID_PACKAGE_NAME }}
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: 安装 Java
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: 安装 Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: 3.38.10   # 与 DeGate 一致
+          cache: true
+
+      - name: 安装 Ruby 与 fastlane 依赖
+        uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: android
+
+      - name: 还原签名材料（keystore + key.properties）
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ vars.ANDROID_KEY_ALIAS }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+
+      - name: flutter pub get
+        run: flutter pub get
+
+      - name: 构建签名 .aab
+        run: flutter build appbundle --release
+
+      - name: 打印产物 SHA-256
+        run: sha256sum build/app/outputs/bundle/release/app-release.aab
+
+      - name: 生成 SLSA Build Provenance
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
+        with:
+          subject-path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: 生成 SBOM（Syft → SPDX JSON）
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          path: "."
+          format: spdx-json
+          output-file: build/app/outputs/bundle/release/app-release.sbom.spdx.json
+          upload-artifact: false
+
+      - name: 为 .aab 生成 SBOM attestation
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        with:
+          subject-path: build/app/outputs/bundle/release/app-release.aab
+          sbom-path: build/app/outputs/bundle/release/app-release.sbom.spdx.json
+
+      - name: 上传 Google Play Internal app sharing（可选）
+        if: ${{ inputs.upload-to-store }}
+        working-directory: android
+        run: bundle exec fastlane android upload
+
+      - name: 归档产物
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-aab
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/bundle/release/app-release.sbom.spdx.json
+          if-no-files-found: error

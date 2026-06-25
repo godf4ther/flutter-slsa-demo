@@ -1,0 +1,116 @@
+name: Build, Sign & Attest iOS (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      upload-to-store:
+        description: "构建并 attest 后是否上传 App Store Connect"
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  build-ios:
+    runs-on: macos-26
+    permissions:
+      contents: read
+      id-token: write        # Sigstore OIDC
+      attestations: write    # 写 artifact attestation
+    env:
+      APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
+      FASTLANE_TEAM_ID: ${{ vars.FASTLANE_TEAM_ID }}
+      MATCH_GIT_URL: ${{ vars.MATCH_GIT_URL }}
+      MATCH_READONLY: "true"
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      FASTLANE_ITC_TEAM_ID: ${{ vars.FASTLANE_ITC_TEAM_ID }}
+      FASTLANE_APP_ID: ${{ vars.FASTLANE_APP_ID }}
+      FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+      FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: 选择 Xcode 版本
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          [ -z "$XCODE" ] && XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "使用 $XCODE"
+          sudo xcode-select -switch "$XCODE"
+
+      - name: 安装 Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: 3.38.10   # 与 DeGate 一致
+          cache: true
+
+      - name: 安装 Ruby 与 fastlane 依赖
+        uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: flutter pub get + 生成 iOS 配置
+        run: |
+          flutter pub get
+          flutter build ios --release --config-only --no-codesign
+
+      - name: pod install
+        working-directory: ios
+        run: pod install
+
+      - name: 签发证书仓库短期访问 token
+        id: cert-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.CERT_REPO_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CERT_REPO_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ vars.CERT_REPO_NAME }}
+
+      - name: 用短期 token 组装 match git 凭证
+        run: |
+          AUTH=$(printf 'x-access-token:%s' '${{ steps.cert-token.outputs.token }}' | base64 | tr -d '\n')
+          echo "::add-mask::$AUTH"
+          echo "MATCH_GIT_BASIC_AUTHORIZATION=$AUTH" >> "$GITHUB_ENV"
+
+      - name: 构建签名 .ipa（match + gym）
+        working-directory: ios
+        run: bundle exec fastlane ios build
+
+      - name: 打印产物 SHA-256
+        run: shasum -a 256 build/ios/ipa/flutter_slsa_demo.ipa
+
+      - name: 生成 SLSA Build Provenance
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
+        with:
+          subject-path: build/ios/ipa/flutter_slsa_demo.ipa
+
+      - name: 生成 SBOM（Syft → SPDX JSON）
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          path: "."
+          format: spdx-json
+          output-file: build/ios/ipa/flutter_slsa_demo.sbom.spdx.json
+          upload-artifact: false
+
+      - name: 为 .ipa 生成 SBOM attestation
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        with:
+          subject-path: build/ios/ipa/flutter_slsa_demo.ipa
+          sbom-path: build/ios/ipa/flutter_slsa_demo.sbom.spdx.json
+
+      - name: 上传 App Store Connect（可选）
+        if: ${{ inputs.upload-to-store }}
+        working-directory: ios
+        run: bundle exec fastlane ios upload
+
+      - name: 归档产物
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ios-ipa
+          path: |
+            build/ios/ipa/flutter_slsa_demo.ipa
+            build/ios/ipa/flutter_slsa_demo.sbom.spdx.json
+          if-no-files-found: error

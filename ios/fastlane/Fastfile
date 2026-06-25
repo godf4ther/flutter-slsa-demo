@@ -1,0 +1,64 @@
+# 职责：fastlane 负责【签名打包 .ipa】与【上传】。SLSA provenance 由 GitHub workflow 生成。
+default_platform(:ios)
+
+# 产物固定路径契约：仓库根 build/ios/ipa/flutter_slsa_demo.ipa（workflow 据此 attest）。
+OUTPUT_DIR  = File.expand_path("../../build/ios/ipa", __dir__)
+OUTPUT_NAME = "flutter_slsa_demo.ipa"
+
+platform :ios do
+  desc "下载签名证书与 profile（CI 中 readonly，不登录 Developer Portal）"
+  lane :setup_signing do
+    setup_ci if is_ci
+    # CI：readonly 只 clone + 解密证书，不碰 Apple 账号；本地可写时用 Appfile 的 apple_id 登录 + 交互 2FA。
+    match(type: "appstore", readonly: is_ci)
+  end
+
+  desc "构建签名 .ipa（gym 接管 archive + 签名 + export）"
+  lane :build do
+    setup_signing
+    app_id = ENV.fetch("APP_IDENTIFIER")
+
+    # Flutter 工程默认 manual 签名但未绑定 profile/team；把 match 装好的证书/profile
+    # 写进工程，解决 archive 阶段 "requires a provisioning profile"。
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: ENV.fetch("FASTLANE_TEAM_ID"),
+      bundle_identifier: app_id,
+      code_sign_identity: "Apple Distribution",
+      profile_name: "match AppStore #{app_id}",
+    )
+
+    # gym archive 一个 Flutter iOS workspace 时，xcodebuild 会触发工程内的
+    # flutter assemble build phase 完成 Dart 编译；export_options 由 gym 动态生成，
+    # 因此无需维护静态 ExportOptions.plist。
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: OUTPUT_DIR,
+      output_name: OUTPUT_NAME,
+      clean: true,
+      xcargs: "CURRENT_PROJECT_VERSION=#{ENV['GITHUB_RUN_NUMBER'] || '1'}",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: { app_id => "match AppStore #{app_id}" },
+      },
+    )
+    UI.success("已生成签名 .ipa: #{File.join(OUTPUT_DIR, OUTPUT_NAME)}")
+  end
+
+  desc "上传 .ipa 到 TestFlight（Apple ID + app-specific password，绕过 2FA，不提审上架）"
+  lane :upload do
+    # FASTLANE_USER + FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD 由 env 提供，
+    # upload_to_testflight 底层 altool 据此绕过 2FA。app-specific password 只能上传 binary，
+    # 不能设 changelog / 管证书（会触发 Spaceship 登录失败），故 CI 仅上传。
+    upload_to_testflight(
+      username: ENV.fetch("FASTLANE_USER"),
+      apple_id: ENV["FASTLANE_APP_ID"], # ASC 里 app 的数字 ID（可选，加速定位）
+      ipa: File.join(OUTPUT_DIR, OUTPUT_NAME),
+      skip_waiting_for_build_processing: true,
+    )
+    UI.success("已上传 TestFlight: #{OUTPUT_NAME}")
+  end
+end

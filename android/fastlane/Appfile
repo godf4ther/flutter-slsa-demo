@@ -1,0 +1,2 @@
+package_name(ENV["ANDROID_PACKAGE_NAME"] || "io.slsa.flutterdemo")
+# json_key 走 ENV（CI），不写死路径。

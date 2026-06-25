@@ -1,0 +1,7 @@
+# match：加密的签名证书 + provisioning profile 存放在一个独立私有 git 仓库。
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+type("appstore")
+app_identifier([ENV["APP_IDENTIFIER"] || "io.slsa.flutterdemo"])
+# CI 强制 readonly（Fastfile 用 is_ci 控制；这里给保险默认）。
+readonly(ENV["MATCH_READONLY"] == "true")
