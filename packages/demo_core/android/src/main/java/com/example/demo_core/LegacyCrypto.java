@@ -1,28 +1,33 @@
 package com.example.demo_core;
 
+import java.security.SecureRandom;
 import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
- * 模拟"核心 SDK"的遗留 Java 加密工具。
- * 故意埋入 MASTG 静态检查项对应的漏洞。
+ * 模拟"核心 SDK"的加密工具（已按 MASTG 建议修复）。
  */
 public class LegacyCrypto {
 
-    // [VULN] 硬编码口令 —— MASTG-TEST-0212 (Hardcoded Credentials)
-    // mobsfscan: hardcoded_password
-    private static final String PASSWORD = "SuperSecret123!";
+    // [FIX] 直接持有 SecretKey（如从 Android Keystore 取），不接触原始密钥字节，
+    // 也不通过 new SecretKeySpec(rawBytes) 构造——从源头避免硬编码密钥风险。
+    private final SecretKey key;
 
-    // [VULN] DES 弱算法 + ECB 弱模式 —— MASTG-TEST-0221/0232 (Broken Encryption Algorithms/Modes)
-    // MASTG semgrep: mastg-android-broken-encryption-algorithms / -modes
-    public byte[] encryptLegacy(byte[] data, byte[] key) throws Exception {
-        Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-        SecretKeySpec keySpec = new SecretKeySpec(key, "DES");
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-        return cipher.doFinal(data);
+    public LegacyCrypto(SecretKey key) {
+        this.key = key;
     }
 
-    public String getPassword() {
-        return PASSWORD;
+    // [FIX] AES/GCM 认证加密 + 随机 IV，替换 DES/ECB
+    public byte[] encrypt(byte[] data) throws Exception {
+        byte[] iv = new byte[12];
+        new SecureRandom().nextBytes(iv);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+        byte[] cipherText = cipher.doFinal(data);
+        byte[] out = new byte[iv.length + cipherText.length];
+        System.arraycopy(iv, 0, out, 0, iv.length);
+        System.arraycopy(cipherText, 0, out, iv.length, cipherText.length);
+        return out;
     }
 }

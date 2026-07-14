@@ -1,35 +1,38 @@
 package com.example.demo_core
 
-import java.util.Random
+import java.security.SecureRandom
 import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * 模拟"核心 SDK"的 Kotlin 侧密钥/加密逻辑。
- * 故意埋入 MASTG 静态检查项对应的漏洞，用于演示 CI 静态扫描能命中。
+ * 模拟"核心 SDK"的 Kotlin 侧密钥/加密逻辑（已按 MASTG 建议修复）。
  */
 class DemoCorePlugin {
 
-    // [VULN] 硬编码加密密钥 —— MASTG-TEST-0212 (Use of Hardcoded Cryptographic Keys)
-    // mobsfscan: android_kotlin_hardcoded
-    private val encryptionKey = "hardcoded_aes_key_1234567890abcd"
+    // [FIX] 密钥不再硬编码，由调用方从安全存储（Android Keystore / secure_storage）注入
+    private var encryptionKey: ByteArray = ByteArray(0)
 
-    // [VULN] 用非密码学安全的 java.util.Random 生成 nonce —— MASTG-TEST-0204/0205 (Insecure Random)
+    fun setKey(key: ByteArray) {
+        encryptionKey = key
+    }
+
+    // [FIX] 用密码学安全的 SecureRandom 生成 nonce
     fun generateNonce(): ByteArray {
-        val random = Random()
-        val nonce = ByteArray(16)
+        val random = SecureRandom()
+        val nonce = ByteArray(12)
         random.nextBytes(nonce)
         return nonce
     }
 
-    // [VULN] AES/CBC/PKCS5 + 全零确定性 IV + 无完整性校验 —— MASTG-TEST-0232 (Broken Encryption Modes)
-    // mobsfscan: cbc_kotlin_padding_oracle
+    // [FIX] AES/GCM/NoPadding（认证加密）+ 随机 IV，替换 CBC + 确定性 IV
     fun encrypt(plain: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        val keySpec = SecretKeySpec(encryptionKey.toByteArray(), "AES")
-        val iv = IvParameterSpec(ByteArray(16))
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv)
-        return cipher.doFinal(plain)
+        val iv = generateNonce()
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val keySpec = SecretKeySpec(encryptionKey, "AES")
+        val spec = GCMParameterSpec(128, iv)
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec, spec)
+        val cipherText = cipher.doFinal(plain)
+        return iv + cipherText
     }
 }
