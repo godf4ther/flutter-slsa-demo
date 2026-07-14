@@ -1,0 +1,45 @@
+# 蓝图 — MAS Checklist 静态原生检查在 GitHub Actions 的可行形态
+# 状态：蓝图，未接入运行（本次只调研可行性）。范围：原生代码 Swift/ObjC/Java/Kotlin，不含 Dart。
+name: mas-static-native-scan
+on: [pull_request]
+
+jobs:
+  # ── 源码 SAST（✅ 现成规则 + 🟡 ObjC libsast）───────────────────────────
+  sast:
+    runs-on: ubuntu-latest          # 静态无需 emulator
+    steps:
+      - uses: actions/checkout@v4
+      - run: pipx install semgrep mobsfscan
+      - name: 克隆 MASTG 官方规则
+        run: git clone --depth 1 https://github.com/OWASP/mastg /tmp/mastg
+      - name: Android 原生（Java/Kotlin）
+        run: |
+          # 会 ship 的 android 原生目录（我们 fork 的 packages + app）
+          DIRS="android $(find packages -type d -name android -not -path '*/example/*' | tr '\n' ' ')"
+          semgrep scan --config /tmp/mastg/rules --config p/java --config p/kotlin \
+            --metrics=off --sarif -o android.sarif $DIRS       # CI 是 bash，无需 zsh 的 ${=DIRS}
+      - name: iOS 原生（Swift + ObjC via libsast）逐目录跑
+        run: |
+          # mobsfscan 多路径有 bug，逐目录扫再各出 sarif
+          for d in $(find packages -type d -name ios -not -path '*/example/*'); do
+            mobsfscan --sarif -o "ios_$(echo $d | tr / _).sarif" "$d" || true   # exit=1=有发现
+          done
+      - name: 上报 SARIF 到 code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with: { sarif_file: . }
+
+  # ── 二进制加固检查（🔴 PIC/Canary/符号/签名）──────────────────────────
+  binary-hardening:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y radare2 checksec
+      # 需先有构建产物；此处示意对已构建的 .so / Mach-O 跑 checksec/radare2
+      - run: echo "对 build 产物跑 checksec / radare2 校验 PIC、Stack Canary、符号剥离、签名"
+
+  # ── SCA 依赖漏洞（🔴 原生依赖）────────────────────────────────────────
+  sca:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "osv-scanner / Dependabot 扫原生依赖已知漏洞；追踪域名黑名单比对"

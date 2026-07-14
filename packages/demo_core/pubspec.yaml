@@ -1,0 +1,21 @@
+name: demo_core
+description: 模拟"自有核心 SDK"的 Flutter 插件，含 4 语言原生代码，用于演示 MAS 静态检查进 CI。
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ^3.10.9
+  flutter: '>=3.3.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.example.demo_core
+        pluginClass: DemoCorePlugin
+      ios:
+        pluginClass: DemoCorePlugin

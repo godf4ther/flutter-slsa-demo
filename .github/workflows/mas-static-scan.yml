@@ -1,0 +1,76 @@
+name: MAS Static Scan (demo_core)
+
+# 演示：把 MAS Checklist 的静态原生检查继承进 GitHub CI。
+# 范围：只扫 packages/demo_core 的原生核心代码（Swift/ObjC/Java/Kotlin），不扫 Dart 业务层。
+# 与 SLSA 的三个 workflow 相互独立。
+
+on:
+  push:
+    paths:
+      - 'packages/demo_core/**'
+      - '.github/workflows/mas-static-scan.yml'
+  pull_request:
+    paths:
+      - 'packages/demo_core/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write   # 上传 SARIF 到 Security → Code scanning
+
+jobs:
+  static-scan:
+    runs-on: ubuntu-latest   # 静态扫描无需 emulator/真机
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装扫描器（semgrep + mobsfscan 装同一环境，保证 mobsfscan 能找到 semgrep）
+        run: python -m pip install --upgrade semgrep mobsfscan
+
+      - name: 拉取 MASTG 官方 Android 规则
+        run: git clone --depth 1 https://github.com/OWASP/mastg.git /tmp/mastg
+
+      # ── Android 原生（Kotlin/Java）：MASTG 规则 + p/java + p/kotlin（AST 级）──
+      - name: semgrep — Android 原生
+        run: |
+          semgrep scan \
+            --config /tmp/mastg/rules --config p/java --config p/kotlin \
+            --metrics=off --error --sarif --output semgrep-android.sarif \
+            packages/demo_core/android || true
+
+      - name: mobsfscan — Android 原生（加密/硬编码补充）
+        run: mobsfscan --sarif -o mobsfscan-android.sarif packages/demo_core/android || true
+
+      # ── iOS 原生（Swift AST + ObjC libsast）──
+      - name: mobsfscan — iOS 原生（Swift + ObjC）
+        run: mobsfscan --sarif -o mobsfscan-ios.sarif packages/demo_core/ios || true
+
+      # ── 汇总，让 Actions 日志直接看到命中数 ──
+      - name: findings 汇总
+        run: |
+          python3 - <<'PY'
+          import json, glob, os
+          total = 0
+          for f in sorted(glob.glob("*.sarif")):
+              try:
+                  d = json.load(open(f))
+                  n = sum(len(r.get("results", [])) for r in d.get("runs", []))
+              except Exception:
+                  n = 0
+              total += n
+              print(f"  {f:28} findings={n}")
+          print(f"\n>>> 合计命中: {total}")
+          # 演示门禁：埋了漏洞，应当命中 >0
+          if total == 0:
+              print("::warning::未命中任何 finding（预期应命中埋入的漏洞）")
+          PY
+
+      - name: 上传 SARIF 到 Code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: .

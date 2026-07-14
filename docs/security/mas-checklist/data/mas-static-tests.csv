@@ -1,0 +1,144 @@
+id,platform,masvs,type,profiles,has_manual,weakness,title
+MASTG-TEST-0326,android,AUTH,"[static, code]",[L2],no,MASWE-0045,References to APIs Allowing Fallback to Non-Biometric Authentication
+MASTG-TEST-0327,android,AUTH,"[static, code]",[L2],no,MASWE-0044,References to APIs for Event-Bound Biometric Authentication
+MASTG-TEST-0328,android,AUTH,"[static, code]",[L2],no,MASWE-0046,References to APIs Detecting Biometric Enrollment Changes
+MASTG-TEST-0329,android,AUTH,"[static, code]",[L2],no,MASWE-0044,References to APIs Enforcing Authentication without Explicit User Action
+MASTG-TEST-0330,android,AUTH,"[static, code]",[L2],no,MASWE-0044,References to APIs for Keys used in Biometric Authentication with Extended Validity Duration
+MASTG-TEST-0222,android,CODE,"[static, code]",[L2],no,MASWE-0116,Position Independent Code (PIC) Not Enabled
+MASTG-TEST-0223,android,CODE,"[static, code]",[L2],no,MASWE-0116,Stack Canaries Not Enabled
+MASTG-TEST-0245,android,CODE,"[static, code]",[L2],no,MASWE-0077,References to Platform Version APIs
+MASTG-TEST-0272,android,CODE,"[static, code]","[L1, L2]",no,MASWE-0076,Identify Dependencies with Known Vulnerabilities in the Android Project
+MASTG-TEST-0274,android,CODE,"[static, developer]","[L1, L2]",no,MASWE-0076,Dependencies with Known Vulnerabilities in the App's SBOM
+MASTG-TEST-0337,android,CODE,"[static, code]","[L1, L2]",no,MASWE-0088,References to Object Deserialization of Untrusted Data
+MASTG-TEST-0339,android,CODE,"[static, code]","[L1, L2]",no,MASWE-0086,SQL Injection in Content Providers
+MASTG-TEST-0372,android,CODE,"[static, code, manual]","[L1, L2]",yes,MASWE-0066,Implicit Intents Used for Internal App Communication
+MASTG-TEST-0374,android,CODE,"[static, code, manual]","[L1, L2]",yes,MASWE-0066,References to Implicit Intents Carrying Sensitive Extras
+MASTG-TEST-0392,android,CODE,"[static, code, manual]",[L2],yes,MASWE-0075,References to Enforced Updating APIs
+MASTG-TEST-0398,android,CODE,"[static, code, manual]","[L1, L2]",yes,MASWE-0071,References to WebViewClient URL Loading Handlers
+MASTG-TEST-0399,android,CODE,"[static, config, code]","[L1, L2]",no,MASWE-0071,SafeBrowsing Disabled
+MASTG-TEST-0204,android,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0027,Insecure Random API Usage
+MASTG-TEST-0205,android,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0027,Non-random Sources Usage
+MASTG-TEST-0208,android,CRYPTO,"[static, code]","[L1, L2]",no,MASWE-0009,Insufficient Key Sizes
+MASTG-TEST-0212,android,CRYPTO,"[static, code]","[L1, L2]",no,MASWE-0014,Use of Hardcoded Cryptographic Keys in Code
+MASTG-TEST-0221,android,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0020,Broken Symmetric Encryption Algorithms
+MASTG-TEST-0232,android,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0020,Broken Symmetric Encryption Modes
+MASTG-TEST-0307,android,CRYPTO,"[static, code]",[L2],no,MASWE-0012,References to Asymmetric Key Pairs Used For Multiple Purposes
+MASTG-TEST-0309,android,CRYPTO,"[static, code]",[L2],no,MASWE-0022,References to Reused Initialization Vectors in Symmetric Encryption
+MASTG-TEST-0312,android,CRYPTO,"[static, code]","[L1, L2]",no,MASWE-0020,References to Explicit Security Provider in Cryptographic APIs
+MASTG-TEST-0217,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,Insecure TLS Protocols Explicitly Allowed in Code
+MASTG-TEST-0233,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,Hardcoded HTTP URLs
+MASTG-TEST-0234,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0052,Missing Implementation of Server Hostname Verification with SSLSockets
+MASTG-TEST-0235,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,Android App Configurations Allowing Cleartext Traffic
+MASTG-TEST-0237,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,Cross-Platform Framework Configurations Allowing Cleartext Traffic
+MASTG-TEST-0239,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,Using low-level APIs (e.g. Socket) to set up a custom HTTP connection
+MASTG-TEST-0242,android,NETWORK,"[static, code]",[L2],no,MASWE-0047,Missing Certificate Pinning in Network Security Configuration
+MASTG-TEST-0243,android,NETWORK,"[static, code]",[L2],no,MASWE-0047,Expired Certificate Pins in the Network Security Configuration
+MASTG-TEST-0282,android,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0052,Unsafe Custom Trust Evaluation
+MASTG-TEST-0283,android,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0052,Incorrect Implementation of Server Hostname Verification
+MASTG-TEST-0284,android,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0052,Incorrect SSL Error Handling in WebViews
+MASTG-TEST-0285,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0052,Outdated Android Version Allowing Trust in User-Provided CAs
+MASTG-TEST-0286,android,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0052,Network Security Configuration Allowing Trust in User-Provided CAs
+MASTG-TEST-0295,android,NETWORK,"[static, code]",[L2],no,MASWE-0052,GMS Security Provider Not Updated
+MASTG-TEST-0250,android,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0069,References to Content Provider Access in WebViews
+MASTG-TEST-0252,android,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0069,References to Local File Access in WebViews
+MASTG-TEST-0258,android,PLATFORM,"[static, code]",[L2],no,MASWE-0053,References to Keyboard Caching Attributes in UI Elements
+MASTG-TEST-0291,android,PLATFORM,"[static, code]",[L2],no,MASWE-0055,References to Screen Capturing Prevention APIs
+MASTG-TEST-0292,android,PLATFORM,"[static, code]",[L2],no,MASWE-0055,"""`setRecentsScreenshotEnabled` Not Used to Prevent Screenshots When Backgrounded"""
+MASTG-TEST-0293,android,PLATFORM,"[static, code]",[L2],no,MASWE-0055,"""`setSecure` Not Used to Prevent Screenshots in SurfaceViews"""
+MASTG-TEST-0294,android,PLATFORM,"[static, code]",[L2],no,MASWE-0055,"""`SecureOn` Not Used to Prevent Screenshots in Compose Dialogs"""
+MASTG-TEST-0315,android,PLATFORM,"[static, code]",[L2],no,MASWE-0054,Sensitive Data Exposed via Notifications
+MASTG-TEST-0316,android,PLATFORM,"[static, code, manual]",[L2],yes,MASWE-0053,App Exposing User Authentication Data in Text Input Fields
+MASTG-TEST-0334,android,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0069,Native Code Exposed Through WebViews
+MASTG-TEST-0340,android,PLATFORM,"[static, code]",[L2],no,MASWE-0053,References to Overlay Attack Protections
+MASTG-TEST-0355,android,PLATFORM,"[static, config, manual]","[L1, L2]",yes,MASWE-0064,References to Unauthorized Database Access through Content Providers
+MASTG-TEST-0357,android,PLATFORM,"[static, config, code, manual]","[L1, L2]",yes,MASWE-0064,References to Oversharing of File-Based Content Providers
+MASTG-TEST-0364,android,PLATFORM,"[static, config, code, manual]","[L1, L2]",yes,MASWE-0119,Exported And Unprotected Activities That Expose Sensitive Functionality
+MASTG-TEST-0365,android,PLATFORM,"[static, config, code, manual]","[L1, L2]",yes,MASWE-0062,Exported And Unprotected Services That Expose Sensitive Functionality
+MASTG-TEST-0366,android,PLATFORM,"[static, config, code, manual]","[L1, L2]",yes,MASWE-0063,Exported And Unprotected Broadcast Receivers That Expose Sensitive Functionality
+MASTG-TEST-0381,android,PLATFORM,[static],"[L1, L2]",no,MASWE-0066,References to Insecure PendingIntent Creation
+MASTG-TEST-0393,android,PLATFORM,"[static, config]","[L1, L2]",no,MASWE-0058,Use of Unverified App Links
+MASTG-TEST-0394,android,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0058,Missing Input Validation in Custom URL Scheme Handlers
+MASTG-TEST-0254,android,PRIVACY,"[static, code]",[P],no,MASWE-0117,Dangerous App Permissions
+MASTG-TEST-0318,android,PRIVACY,"[static, code]",[P],no,MASWE-0112,References to SDK APIs Known to Handle Sensitive User Data
+MASTG-TEST-0224,android,RESILIENCE,"[static, code]",[R],no,MASWE-0104,Usage of Insecure APK Signature Version
+MASTG-TEST-0225,android,RESILIENCE,"[static, code]",[R],no,MASWE-0104,Usage of Insecure APK Signature Key Size
+MASTG-TEST-0226,android,RESILIENCE,"[static, code]",[R],no,MASWE-0067,Debuggable Flag Enabled in the AndroidManifest
+MASTG-TEST-0227,android,RESILIENCE,"[static, code]",[R],no,MASWE-0067,Debugging Enabled for WebViews
+MASTG-TEST-0247,android,RESILIENCE,"[static, code]",[L2],no,MASWE-0008,References to APIs for Detecting Secure Screen Lock
+MASTG-TEST-0265,android,RESILIENCE,"[static, code]",[R],no,MASWE-0094,References to StrictMode APIs
+MASTG-TEST-0288,android,RESILIENCE,"[static, code]",[R],no,MASWE-0093,Debugging Symbols in Native Binaries
+MASTG-TEST-0324,android,RESILIENCE,"[static, code]",[R],no,MASWE-0097,References to Root Detection Mechanisms
+MASTG-TEST-0338,android,RESILIENCE,"[static, code, manual]",[R],yes,MASWE-0105,References to Storage Integrity Check APIs
+MASTG-TEST-0352,android,RESILIENCE,"[static, code, manual]",[R],yes,MASWE-0101,References to Debugging Detection APIs
+MASTG-TEST-0368,android,RESILIENCE,"[static, code, manual]",[R],yes,MASWE-0089,Insufficient Obfuscation of Security-Relevant Java/Kotlin Code
+MASTG-TEST-0369,android,RESILIENCE,"[static, package, manual]",[R],yes,MASWE-0089,Insufficient Obfuscation of Security-Relevant Native Code
+MASTG-TEST-0202,android,STORAGE,"[static, code, manual]","[L1, L2]",yes,MASWE-0007,References to APIs and Permissions for Accessing External Storage
+MASTG-TEST-0231,android,STORAGE,"[static, code]","[L1, L2, P]",no,MASWE-0001,References to Logging APIs
+MASTG-TEST-0262,android,STORAGE,"[static, code]","[L1, L2, P]",no,MASWE-0004,References to Backup Configurations Not Excluding Sensitive Data
+MASTG-TEST-0304,android,STORAGE,"[static, code]","[L1, L2]",no,MASWE-0006,References to Sensitive Data Unencrypted via Android Room Database
+MASTG-TEST-0305,android,STORAGE,"[static, dynamic]","[L1, L2]",no,MASWE-0006,Sensitive Data Stored Unencrypted via DataStore
+MASTG-TEST-0306,android,STORAGE,"[static, code]","[L1, L2]",no,MASWE-0006,References to Sensitive Data Stored Unencrypted via Android Room DB
+MASTG-TEST-0266,ios,AUTH,"[static, code]",[L2],no,MASWE-0044,References to APIs for Event-Bound Biometric Authentication
+MASTG-TEST-0268,ios,AUTH,"[static, code]",[L2],no,MASWE-0045,References to APIs Allowing Fallback to Non-Biometric Authentication
+MASTG-TEST-0270,ios,AUTH,"[static, code]",[L2],no,MASWE-0046,References to APIs Detecting Biometric Enrollment Changes
+MASTG-TEST-0228,ios,CODE,"[static, code]",[L2],no,MASWE-0116,Position Independent Code (PIC) not Enabled
+MASTG-TEST-0229,ios,CODE,"[static, code]",[L2],no,MASWE-0116,Stack Canaries Not enabled
+MASTG-TEST-0230,ios,CODE,"[static, code]",[L2],no,MASWE-0116,Automatic Reference Counting (ARC) not enabled
+MASTG-TEST-0273,ios,CODE,"[static, code]","[L1, L2]",no,MASWE-0076,Identify Dependencies with Known Vulnerabilities by Scanning Dependency Managers Artifacts
+MASTG-TEST-0275,ios,CODE,"[static, developer]","[L1, L2]",no,MASWE-0076,Dependencies with Known Vulnerabilities in the App's SBOM
+MASTG-TEST-0383,ios,CODE,"[static, code, manual]",[L2],yes,MASWE-0075,References to Enforced Updating APIs
+MASTG-TEST-0386,ios,CODE,"[static, code, manual]","[L1, L2]",yes,MASWE-0088,References to Object Deserialization of Untrusted Data
+MASTG-TEST-0209,ios,CRYPTO,"[static, code]","[L1, L2]",no,MASWE-0009,Insufficient Key Sizes
+MASTG-TEST-0210,ios,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0020,Broken Symmetric Encryption Algorithms
+MASTG-TEST-0211,ios,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0021,Broken Hashing Algorithms
+MASTG-TEST-0213,ios,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0014,Use of Hardcoded Cryptographic Keys in Code
+MASTG-TEST-0214,ios,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0014,Hardcoded Cryptographic Keys in Files
+MASTG-TEST-0311,ios,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0027,Insecure Random API Usage
+MASTG-TEST-0317,ios,CRYPTO,"[static, code, manual]","[L1, L2]",yes,MASWE-0020,Broken Symmetric Encryption Modes
+MASTG-TEST-0321,ios,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,Hardcoded HTTP URLs
+MASTG-TEST-0322,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0050,App Transport Security Configurations Allowing Cleartext Traffic
+MASTG-TEST-0323,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0050,Uses of Low-Level Networking APIs for Cleartext Traffic
+MASTG-TEST-0342,ios,NETWORK,"[static, code]","[L1, L2]",no,MASWE-0050,References to Weak ATS TLS Policy Exceptions in Info.plist
+MASTG-TEST-0343,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0050,URLSession TLS Protocol Configuration
+MASTG-TEST-0344,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0050,Network.framework TLS Protocol Configuration
+MASTG-TEST-0345,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0050,Embedded or Third-party TLS Stack Configuration
+MASTG-TEST-0385,ios,NETWORK,[static],[L2],no,MASWE-0047,Missing Certificate Pinning in ATS
+MASTG-TEST-0396,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0052,References to URLSessionDelegate Bypassing Certificate Validation
+MASTG-TEST-0397,ios,NETWORK,"[static, code, manual]","[L1, L2]",yes,MASWE-0052,References to WKNavigationDelegate Bypassing Certificate Validation
+MASTG-TEST-0276,ios,PLATFORM,"[static, code, manual]",[L2],yes,MASWE-0053,Use of the iOS General Pasteboard
+MASTG-TEST-0278,ios,PLATFORM,"[static, code]",[L2],no,MASWE-0053,Pasteboard Contents Not Cleared After Use
+MASTG-TEST-0279,ios,PLATFORM,"[static, code]",[L2],no,MASWE-0053,Pasteboard Contents Not Expiring
+MASTG-TEST-0280,ios,PLATFORM,"[static, code]",[L2],no,MASWE-0053,Pasteboard Contents Not Restricted to Local Device
+MASTG-TEST-0331,ios,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0072,Use of Deprecated WebView APIs
+MASTG-TEST-0332,ios,PLATFORM,"[static, code, manual]","[L1, L2, P]",yes,MASWE-0071,Attacker-Controlled URI in WebViews
+MASTG-TEST-0333,ios,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0069,Overly Broad File Read Access in WebViews
+MASTG-TEST-0335,ios,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0069,WebView File Origin Access Relaxed by Configuration
+MASTG-TEST-0346,ios,PLATFORM,"[static, code, manual]",[L2],yes,MASWE-0053,References to APIs Hiding Sensitive Data in Text Input Fields
+MASTG-TEST-0370,ios,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0058,Missing Input Validation in Custom URL Scheme Handlers
+MASTG-TEST-0371,ios,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0058,Missing Source Validation in Custom URL Scheme Handlers
+MASTG-TEST-0376,ios,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0069,References to Native Bridge APIs in WebViews
+MASTG-TEST-0377,ios,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0069,References to `evaluateJavaScript` Used as Bridge Reply in `WKScriptMessageHandler`
+MASTG-TEST-0378,ios,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0069,References to Password Fields in WebView-Loaded HTML
+MASTG-TEST-0379,ios,PLATFORM,"[static, code]","[L1, L2]",no,MASWE-0069,References to `evaluateJavaScript` Without Content World Isolation
+MASTG-TEST-0380,ios,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0069,References to `evaluateJavaScript` Writing Sensitive Data into WebView DOM
+MASTG-TEST-0389,ios,PLATFORM,"[static, code, manual]",[L2],yes,MASWE-0061,References to the App-Wide Restriction of Custom Keyboards
+MASTG-TEST-0390,ios,PLATFORM,"[static, code, manual]",[L2],yes,MASWE-0061,Full Access Requested by a Custom Keyboard Extension
+MASTG-TEST-0395,ios,PLATFORM,"[static, code, manual]","[L1, L2]",yes,MASWE-0058,Missing Input Validation in Universal Link Handlers
+MASTG-TEST-0281,ios,PRIVACY,"[static, dynamic]",[P],no,MASWE-0108,Undeclared Known Tracking Domains
+MASTG-TEST-0360,ios,PRIVACY,"[static, config, manual]",[P],yes,MASWE-0117,Purpose String Accuracy for Reachable Protected Resource Access
+MASTG-TEST-0362,ios,PRIVACY,"[static, package, manual]",[P],yes,MASWE-0117,Entitlements for Unjustified Capability Exposure
+MASTG-TEST-0219,ios,RESILIENCE,"[static, code]",[R],no,MASWE-0093,Testing for Debugging Symbols
+MASTG-TEST-0220,ios,RESILIENCE,"[static, code]",[R],no,MASWE-0104,Usage of Outdated Code Signature Format
+MASTG-TEST-0240,ios,RESILIENCE,"[static, code]",[R],no,MASWE-0097,Jailbreak Detection in Code
+MASTG-TEST-0248,ios,RESILIENCE,"[static, code]",[L2],no,MASWE-0008,References to APIs for Detecting Secure Screen Lock
+MASTG-TEST-0261,ios,RESILIENCE,"[static, code]",[R],no,MASWE-0067,Debuggable Entitlement Enabled in the entitlements.plist
+MASTG-TEST-0358,ios,RESILIENCE,"[static, code]",[R],no,MASWE-0094,Implementation Details Exposure Through Logging APIs
+MASTG-TEST-0387,ios,RESILIENCE,"[static, code, manual]",[R],yes,MASWE-0105,References to Storage Integrity Check APIs
+MASTG-TEST-0391,ios,RESILIENCE,"[static, package, manual]",[R],yes,MASWE-0089,Insufficient Obfuscation of Security-Relevant Native Code
+MASTG-TEST-0401,ios,RESILIENCE,"[static, code, manual]",[R],yes,MASWE-0101,References to Debugging Detection APIs
+MASTG-TEST-0215,ios,STORAGE,"[static, code]","[L1, L2, P]",no,MASWE-0004,Sensitive Data Not Marked For Backup Exclusion
+MASTG-TEST-0297,ios,STORAGE,"[static, code]","[L1, L2]",no,MASWE-0001,Sensitive Data Exposure Through Logging APIs
+MASTG-TEST-0300,ios,STORAGE,"[static, code]",[L2],no,MASWE-0006,References to APIs for Storing Unencrypted Data in Private Storage
+MASTG-TEST-0303,ios,STORAGE,"[static, code]","[L1, L2]",no,MASWE-0007,References to APIs for Storing Unencrypted Data in Shared Storage
+MASTG-TEST-0313,ios,STORAGE,"[static, code, manual]",[L2],yes,MASWE-0053,References to APIs for Preventing Keyboard Caching of Text Fields
+MASTG-TEST-0388,ios,STORAGE,"[static, code, manual]","[L1, L2]",yes,MASWE-0006,References to Sensitive Data Stored Unprotected in Shared App Group Containers
