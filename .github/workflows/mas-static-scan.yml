@@ -69,8 +69,28 @@ jobs:
               print("::warning::未命中任何 finding（预期应命中埋入的漏洞）")
           PY
 
-      - name: 上传 SARIF 到 Code scanning
+      # 每个 SARIF 单独上传 + 各自不同 category（CodeQL 不允许一次上传多个同 category 的 run）
+      # continue-on-error：上传问题不拖垮整个 job，扫描本身才是重点
+      - name: 上传 SARIF — semgrep-android
         if: always()
+        continue-on-error: true
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: .
+          sarif_file: semgrep-android.sarif
+          category: semgrep-android
+
+      - name: 上传 SARIF — mobsfscan-android
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: mobsfscan-android.sarif
+          category: mobsfscan-android
+
+      - name: 上传 SARIF — mobsfscan-ios
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: mobsfscan-ios.sarif
+          category: mobsfscan-ios
